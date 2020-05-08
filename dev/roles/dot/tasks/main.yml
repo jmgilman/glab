@@ -1,0 +1,7 @@
+---
+# tasks file for dot
+- name: Dotfiles are up to date
+  copy:
+    src: "{{ item }}"
+    dest: "{{ ansible_env.HOME }}/{{ item }}"
+  with_items: "{{ dot_files }}"

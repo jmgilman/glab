@@ -1,0 +1,64 @@
+---
+# tasks file for mac
+
+- name: Personal taps exist
+  homebrew_tap:
+    name: jmgilman/apps
+
+- name: Homebrew and packages are up to date
+  homebrew:
+   update_homebrew: yes
+   upgrade_all: yes
+
+- name: Custom apps installed
+  homebrew:
+   name: vssh
+   state: present
+
+- name: Programming languages installed
+  homebrew:
+    name: "{{ languages }}"
+    state: present
+
+- name: Development tools installed
+  homebrew:
+   name: "{{ dev_tools }}"
+
+- name: Lab tools installed
+  homebrew:
+   name: "{{ lab_tools }}"
+
+- name: Pip is up to date
+  pip:
+   name: ['pip', 'setuptools']
+   executable: pip3
+   state: latest
+
+- name: Python packages are installed and up to date
+  pip:
+   name: "{{ py_packages }}"
+   state: latest
+   executable: pip3
+
+- name: Code directory exists
+  file:
+   path: ~/code
+   state: directory
+
+- name: Private repositories exist
+  git:
+   repo: "https://jmgilman:{{ github_token }}@github.com/jmgilman/{{ item }}.git"
+   dest: ~/code/{{ item }}
+   update: no
+  with_items: "{{ repositories }}"
+
+- name: SSH client configuration is up to date
+  copy:
+    src: ssh-config
+    dest: "{{ ansible_env.HOME }}/.ssh/config"
+
+- name: SSH hosts are trusted
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/known_hosts"
+    line: "@cert-authority: *.gilman.io {{ lookup('hashivault', '/ssh-host/config/ca', 'public_key') }}"
+    regexp: '^@cert-authority'

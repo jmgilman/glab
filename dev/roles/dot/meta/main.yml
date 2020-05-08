@@ -1,0 +1,7 @@
+galaxy_info:
+  author: Joshua Gilman
+  description: Installs common dotfiles for developing glab
+  license: MIT
+  min_ansible_version: 2.9
+  galaxy_tags: []
+dependencies: []

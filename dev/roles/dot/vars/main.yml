@@ -1,0 +1,9 @@
+---
+# vars file for dot
+dot_files:
+  - .bash_prompt
+  - .bashrc
+  - .exports
+  - .functions
+  - .gitconfig
+  - .gitignore

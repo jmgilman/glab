@@ -1,0 +1,16 @@
+---
+# vars file for mac
+
+# Needed to clone private Github repositories
+github_token: "{{ lookup('env','GITHUB_TOKEN') }}"
+
+# Program lists
+languages: ['go', 'node', 'python3', 'ruby']
+dev_tools: ['hey', 'http-server', 'protobuf']
+lab_tools: ['consul', 'packer', 'terraform', 'vault', 'kubectl', 'minikube']
+
+# Python packages
+py_packages: ['passlib', 'pyvmomi', 'git+https://github.com/vmware/vsphere-automation-sdk-python.git']
+
+# Personal repositories
+repositories: ['glab', 'vssh']
