@@ -1,9 +1,10 @@
 ---
-- hosts: Kube*
+- hosts: kubeworker*
   vars:
     #force_ssh_host: yes # Forcibly generate SSH host keys
     docker_users:
       - josh
+    kubernetes_role: node
   roles:
     - ssh_server
     - common

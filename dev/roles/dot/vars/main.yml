@@ -3,6 +3,7 @@
 dot_files:
   - .bash_prompt
   - .bashrc
+  - .devenv
   - .exports
   - .functions
   - .gitconfig

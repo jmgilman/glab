@@ -7,8 +7,3 @@
   loop: "{{ key_types }}"
   loop_control:
     loop_var: type
-- name: Configure SSH daemon
-  become: yes
-  copy:
-    src: sshd_config
-    dest: /etc/ssh/sshd_config
