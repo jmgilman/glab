@@ -1,0 +1,16 @@
+---
+# tasks file for base
+- name: Sudo password is disabled
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+- name: Common user is configured
+  become: yes
+  user:
+    name: josh
+    groups: josh, sudo
+    password: "{{ lookup('hashivault', 'user/josh', 'password') | password_hash('sha512') }}"

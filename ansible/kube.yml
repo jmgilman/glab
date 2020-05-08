@@ -1,6 +1,11 @@
 ---
 - hosts: Kube*
   vars:
-    force_ssh_host: yes # Forcibly generate SSH host keys
+    #force_ssh_host: yes # Forcibly generate SSH host keys
+    docker_users:
+      - josh
   roles:
     - ssh_server
+    - common
+    - { role: geerlingguy.docker, become: yes }
+    - { role: geerlingguy.kubernetes, become: yes }
