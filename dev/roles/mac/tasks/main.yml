@@ -60,5 +60,5 @@
 - name: SSH hosts are trusted
   lineinfile:
     path: "{{ ansible_env.HOME }}/.ssh/known_hosts"
-    line: "@cert-authority: *.gilman.io {{ lookup('hashivault', '/ssh-host/config/ca', 'public_key') }}"
+    line: "@cert-authority *.gilman.io {{ lookup('hashivault', '/ssh-host/config/ca', 'public_key') }}"
     regexp: '^@cert-authority'
