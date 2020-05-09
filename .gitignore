@@ -1,2 +1,2 @@
-packer/packer_cache/*
-terraform/.terraform/*
+*packer_cache*
+*.terraform*

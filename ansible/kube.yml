@@ -1,21 +1,21 @@
 ---
 - hosts: Kubernetes
-  become: yes
-  vars:
-    force_ssh_host: yes # Forcibly generate SSH host keys
   roles:
-    - ssh_server
     - common
+    - ssh_server
   tasks:
     - name: Disable SWAP since kubernetes can't work with swap enabled
+      become: yes
       shell: swapoff -a
     - name: Disable SWAP in fstab since kubernetes can't work with swap enabled
+      become: yes
       replace:
         path: /etc/fstab
         regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
         replace: '# \1'
       register: fstab
     - name: Reboot machines to finalize disabling swap
+      become: yes
       reboot:
       when: fstab.changed
 
@@ -47,7 +47,10 @@
         path: "{{ ansible_env.HOME }}/.kube"
         state: directory
     - name: Kube admin config exists
-      copy:
-        src: /etc/kubernetes/admin.conf
-        dest: "{{ ansible_env.HOME }}/.kube/config"
-        remote_src: yes
+        become: yes
+        copy:
+          src: /etc/kubernetes/admin.conf
+          dest: "{{ ansible_env.HOME }}/.kube/config"
+          owner: josh
+          group: josh
+          remote_src: yes

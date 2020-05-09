@@ -1,4 +1,5 @@
 {
+  "playbook": "../ansible/common.yml",
   "ssh_username": "{{ vault `/secret/packer/base` `username` }}",
   "ssh_password": "{{ vault `/secret/packer/base` `password` }}",
   "vs_server": "vcenter.gilman.io",

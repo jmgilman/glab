@@ -7,7 +7,7 @@
   shell:
     cmd: "ssh-keygen -q -t {{ type }} -f '/etc/ssh/ssh_host_{{ type }}_key' -N '' <<< y"
     executable: /bin/bash
-  when: force_ssh_host
+  when: force_ssh_host|bool
 
 # Validates host key exists and creates it if it does not
 - name: "Check for SSH {{ type|upper }} host key"

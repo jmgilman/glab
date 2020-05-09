@@ -35,7 +35,7 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "../ansible/common.yml",
+      "playbook_file": "{{ user `playbook` }}",
       "host_alias": "ubuntu18044",
       "user": "{{ user `ssh_username` }}",
       "use_proxy": "false",
