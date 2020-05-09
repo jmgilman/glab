@@ -39,3 +39,15 @@
   roles:
     - { role: geerlingguy.docker, become: yes }
     - { role: geerlingguy.kubernetes, become: yes }
+
+- hosts: Kubernetes_master
+  tasks:
+    - name: Kube user directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+    - name: Kube admin config exists
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        remote_src: yes

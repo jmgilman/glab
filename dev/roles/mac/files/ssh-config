@@ -18,6 +18,26 @@ Host fava
 Host plex
   Hostname plex.gilman.io
 
+# Kubernetes
+
+Host master01
+    Hostname kubem01.gilman.io
+
+Host worker01
+    Hostname kubew01.gilman.io
+
+Host worker02
+    Hostname kubew02.gilman.io
+
+Host worker03
+    Hostname kubew03.gilman.io
+
+Host worker04
+    Hostname kubew04.gilman.io
+
+Host worker05
+    Hostname kubew05.gilman.io
+
 Host *
   User josh
   Port 22
