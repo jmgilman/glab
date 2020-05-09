@@ -44,3 +44,4 @@
     content: "{{ signed_key['data']['data']['signed_key'] }}"
     dest: "/etc/ssh/ssh_host_{{ type }}_key-cert.pub"
   when: force_ssh_host or keygen['changed']
+  notify: restart_ssh

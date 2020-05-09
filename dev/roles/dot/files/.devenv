@@ -4,7 +4,12 @@ export AWS_SECRET_ACCESS_KEY="$(vault kv get -field=secret_key secret/aws/lab)"
 export AWS_DEFAULT_REGION=us-west-2
 export AWS_DEFAULT_OUTPUT=json
 
-# Set vSphere variables
+# Set Ansible vSphere variables for dynamic inventory
 export VMWARE_SERVER="vcenter.gilman.io"
 export VMWARE_USERNAME="$(vault kv get -field=username secret/vsphere/api)"
 export VMWARE_PASSWORD="$(vault kv get -field=password secret/vsphere/api)"
+
+# Set Terraform vSphere variables for connecting to vCenter
+export VSPHERE_SERVER="vcenter.gilman.io"
+export VSPHERE_USER="$(vault kv get -field=username secret/vsphere/api)"
+export VSPHERE_PASSWORD="$(vault kv get -field=password secret/vsphere/api)"
