@@ -25,7 +25,7 @@ check_error $? "Error destroying infrastructure. Aborting..."
 
 # Build master image
 echo "Building master image with Packer..."
-packer build -var-file=packer/vars.json -var "playbook=ansible/common.yml" -force -on-error=ask packer/master.json
+./packer/build.sh
 check_error $? "Error creating master image. Aborting..."
 
 # Apply Terraform config
@@ -33,16 +33,15 @@ echo "Applying Terraform configuration..."
 terraform apply -auto-approve terraform
 check_error $? "Error applying Terraform configuration. Aborting..."
 
-cd ansible
+# Setup Kubespray
+echo "Setting up Kubespray..."
+./kubespray.sh
+check_error $? "Error setting up Kubespray. Aborting..."
 
-# Install Ansible roles
-echo "Installing Ansible roles..."
-ansible-galaxy install -r requirements.yml
-check_error $? "Error installing Ansible roles from Galaxy. Aborting..."
-
-# Apply Ansible config
-echo "Applying Ansible configuration..."
-ansible-playbook --extra-vars '{"force_ssh_host": true}' kube.yml
-check_error $? "Error applying Ansible config. Aborting..."
+cd kubespray
+# Apply Kubespray config
+echo "Applying Kubespray configuration..."
+ansible-playbook -i inventory/gilman/inventory.ini --become --become-user=root cluster.yml
+check_error $? "Error applying Kubespray config. Aborting..."
 
 echo "Deployment successful!"

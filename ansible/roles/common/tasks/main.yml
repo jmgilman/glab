@@ -24,3 +24,27 @@
     name: josh
     groups: josh, sudo
     password: "{{ lookup('hashivault', 'user/josh', 'password') | password_hash('sha512') }}"
+- name: Common tools are installed
+  become: yes
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - unzip
+- name: Vault is installed
+  stat:
+    path: /usr/local/bin/vault
+  register: vault
+- name: Download Vault
+  get_url:
+    url: https://releases.hashicorp.com/vault/1.4.1/vault_1.4.1_linux_amd64.zip
+    dest: /tmp/vault.zip
+  when: not vault.stat.exists
+- name: Install Vault
+  become: yes
+  unarchive:
+    src: /tmp/vault.zip
+    dest: /usr/local/bin
+    remote_src: yes
+  when: not vault.stat.exists

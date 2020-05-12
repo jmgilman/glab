@@ -1,5 +1,4 @@
 {
-  "playbook": "../ansible/common.yml",
   "ssh_username": "{{ vault `/secret/packer/base` `username` }}",
   "ssh_password": "{{ vault `/secret/packer/base` `password` }}",
   "vs_server": "vcenter.gilman.io",
@@ -7,10 +6,9 @@
   "vs_api_password": "{{ vault `/secret/vsphere/api` `password`}}",
   "vs_insecure": "true",
   "vs_datacenter": "Gilman",
-  "vm_name": "ubuntu18044",
   "vm_folder": "Images",
-  "vm_cluster": "NUCs",
-  "vm_datastore": "vsanDatastore",
+  "vm_cluster": "Lab",
+  "vm_datastore": "vsan",
   "vm_notes": "Generated on {{isotime}}",
   "hw_cpus": "2",
   "hw_cores": "2",

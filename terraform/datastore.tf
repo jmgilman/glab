@@ -24,6 +24,6 @@ data "vsphere_datastore" "optane" {
 }
 
 data "vsphere_datastore" "vsan" {
-  name          = "vsanDatastore"
+  name          = "vsan"
   datacenter_id = data.vsphere_datacenter.gilman.id
 }

@@ -36,12 +36,16 @@
     {
       "type": "ansible",
       "playbook_file": "{{ user `playbook` }}",
-      "host_alias": "ubuntu18044",
+      "host_alias": "{{ user `host_alias` }}",
       "user": "{{ user `ssh_username` }}",
       "use_proxy": "false",
       "extra_arguments": [
         "--extra-vars", "ansible_sudo_pass={{ user `ssh_password` }} ansible_ssh_pass={{ user `ssh_password` }}"
       ]
+    },
+    {
+      "type": "shell",
+      "inline": ["curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sudo sh -"]
     }
   ]
 }
