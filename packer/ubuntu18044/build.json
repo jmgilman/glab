@@ -20,8 +20,12 @@
       "disk_size": "{{ user `hw_disk_size` }}",
       "disk_controller_type": "{{ user `hw_disk_controller` }}",
       "disk_thin_provisioned": "{{ user `hw_thin` }}",
-      "network": "{{ user `hw_network` }}",
-      "network_card": "{{ user `hw_network_card` }}",
+      "network_adapters": [
+        {
+          "network": "Dev",
+          "network_card": "vmxnet3"
+        }
+      ],
       "guest_os_type": "{{ user `hw_os` }}",
       "iso_urls": [
         "{{ user `iso_url` }}"

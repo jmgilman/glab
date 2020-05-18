@@ -16,8 +16,6 @@
   "hw_disk_size": "32768",
   "hw_disk_controller": "pvscsi",
   "hw_thin": "true",
-  "hw_network": "Dev",
-  "hw_network_card": "vmxnet3",
   "hw_os": "ubuntu64Guest",
   "iso_url": "http://cdimage.ubuntu.com/ubuntu/releases/18.04/release/ubuntu-18.04.4-server-amd64.iso",
   "iso_checksum": "e2ecdace33c939527cbc9e8d23576381c493b071107207d2040af72595f8990b",

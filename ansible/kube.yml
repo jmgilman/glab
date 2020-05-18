@@ -13,3 +13,13 @@
         regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
         replace: '# \1'
       register: fstab
+    - name: NFS tools are installed
+      become: yes
+      package:
+        name: nfs-common
+        state: present
+    - name: Network configured
+      become: yes
+      copy:
+        src: kube-network.yml
+        dest: /etc/netplan/01-netcfg.yaml

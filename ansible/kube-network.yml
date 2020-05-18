@@ -1,0 +1,30 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens192:
+      dhcp4: yes
+    ens224:
+      dhcp4: yes
+      dhcp4-overrides:
+        use-routes: no
+      routes:
+        - to: 0.0.0.0/0
+          via: 192.168.2.1
+          metric: 100
+          table: 2
+      routing-policy:
+        - from: 192.168.2.0/24
+          table: 2
+    ens256:
+      dhcp4: yes
+      dhcp4-overrides:
+        use-routes: no
+      routes:
+        - to: 0.0.0.0/0
+          via: 192.168.1.1
+          metric: 100
+          table: 3
+      routing-policy:
+        - from: 192.168.1.0/24
+          table: 3

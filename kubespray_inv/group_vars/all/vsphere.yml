@@ -16,5 +16,5 @@ external_vsphere_kubernetes_cluster_id: "gilman"
 # vsphere_csi_provisioner_image_tag: "v1.2.2"
 
 ## To use vSphere CSI plugin to provision volumes set this value to true
-vsphere_csi_enabled: true
+vsphere_csi_enabled: false
 vsphere_csi_controller_replicas: 2

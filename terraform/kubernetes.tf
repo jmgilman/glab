@@ -16,6 +16,20 @@ resource "vsphere_virtual_machine" "kubem01" {
     mac_address    = "00:50:56:8a:28:71"
   }
 
+  network_interface {
+    network_id     = data.vsphere_network.dev.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:30:71"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.prod.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:29:71"
+  }
+
   disk {
     label            = "disk0"
     size             = data.vsphere_virtual_machine.ubuntu18044.disks[0].size
@@ -61,6 +75,20 @@ resource "vsphere_virtual_machine" "kubem02" {
     adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
     use_static_mac = true
     mac_address    = "00:50:56:8a:28:72"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.dev.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:30:72"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.prod.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:29:72"
   }
 
   disk {
@@ -112,6 +140,20 @@ resource "vsphere_virtual_machine" "kubew-medium" {
     mac_address    = "00:50:56:8a:28:8${count.index + 1}"
   }
 
+  network_interface {
+    network_id     = data.vsphere_network.dev.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:30:8${count.index + 1}"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.prod.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:29:8${count.index + 1}"
+  }
+
   disk {
     label            = "disk0"
     size             = data.vsphere_virtual_machine.ubuntu18044.disks[0].size
@@ -159,6 +201,20 @@ resource "vsphere_virtual_machine" "kubew-large" {
     adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
     use_static_mac = true
     mac_address    = "00:50:56:8a:28:8${count.index + 4}"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.dev.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:30:8${count.index + 4}"
+  }
+
+  network_interface {
+    network_id     = data.vsphere_network.prod.id
+    adapter_type   = data.vsphere_virtual_machine.ubuntu18044.network_interface_types[0]
+    use_static_mac = true
+    mac_address    = "00:50:56:8a:29:8${count.index + 4}"
   }
 
   disk {
