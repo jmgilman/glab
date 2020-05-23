@@ -28,6 +28,10 @@ select *Copy URL* -> NFSv4.1
   
 # Load Balancer
 
+Reference:
+* [Load balancers](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/)
+* [MetalLB](https://metallb.universe.tf/)
+
 To setup MetaLB:
 
 * Enable `strictARP`:
@@ -37,8 +41,10 @@ To setup MetaLB:
   * `kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml`
 * If this is the first time installing, generate the secret:
   * `kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"`
+* Create the ConfigMap
+  * `kubectl create -f loadbalancer.yml`
 
-To use it, assign a service the LoadBalancer type and optionally specify a address pool to assign from:
+To use it, assign a service the LoadBalancer type and optionally specify an address pool to assign from:
 ```yaml
 apiVersion: v1
 kind: Service
@@ -57,3 +63,23 @@ spec:
 
 Note the above annotation is redundant as not specifying an address-pool will result in the load balancer assigning an
 address from the `default` pool.
+
+# cert-manager
+
+Reference:
+* [cert-manager](https://cert-manager.io/docs/)
+
+* Create namespace
+  * `kubectl create namespace cert-manager`
+* Add repo
+  * `helm repo add jetstack https://charts.jetstack.io`
+  * `helm repo update`
+* Install Helm chart
+```bash
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v0.15.0 \
+  --set installCRDs=true
+```
+  
