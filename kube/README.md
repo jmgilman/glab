@@ -82,4 +82,7 @@ helm install \
   --version v0.15.0 \
   --set installCRDs=true
 ```
-  
+* Create issuer
+  * Currently you must manually update the token in the cloudflare secret
+  * Create secret: `kubectl create -f cloudflare.yml`
+  * Create issuer: `kubectl create -f clusterissuer.yml`
