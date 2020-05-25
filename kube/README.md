@@ -86,3 +86,15 @@ helm install \
   * Currently you must manually update the token in the cloudflare secret
   * Create secret: `kubectl create -f cloudflare.yml`
   * Create issuer: `kubectl create -f clusterissuer.yml`
+  
+# Ingress (nginx)
+
+* Add repo
+  * `helm repo add nginx-stable https://helm.nginx.com/stable`
+  * `helm repo update`
+* Install the Helm chart
+  * `helm install nginx-ingress nginx-stable/nginx-ingress`
+* Take note of the external IP address assigned:
+  * `kubectl get service`
+* Forward all DNS names to the external IP address
+* Proceed to create ingress resources

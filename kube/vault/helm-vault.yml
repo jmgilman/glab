@@ -1,4 +1,80 @@
-server:
-  affinity: ""
-  ha:
-    enabled: true
+replicaCount: 3
+vault:
+  config:
+    listener:
+      tcp:
+        address: "[::]:8200"
+        tls_disable: true
+    storage:
+      consul:
+        path: vault
+        address: consul-server:8500
+    api_addr: https://secrets.gilman.io
+    cluster_addr: "http://vault:8201"
+    telemetry:
+      statsd_address: ""
+  externalConfig:
+    policies:
+      - name: admin
+        rules: |
+            path "auth/*" {
+            capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+            path "sys/auth/*"
+            {
+            capabilities = ["create", "update", "delete", "sudo"]
+            }
+            path "sys/auth"
+            {
+            capabilities = ["read"]
+            }
+            path "sys/policies/acl/*"
+            {
+            capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+            path "sys/policies/acl"
+            {
+            capabilities = ["list"]
+            }
+            path "secret/*"
+            {
+            capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+            path "sys/mounts/*"
+            {
+            capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+            path "sys/health"
+            {
+            capabilities = ["read", "sudo"]
+            }
+            path "sys/capabilities"
+            {
+            capabilities = ["create", "update"]
+            }
+            path "sys/capabilities-self"
+            {
+            capabilities = ["create", "update"]
+            }
+    auth:
+      - type: github
+        config:
+          organization: Gilman-Lab
+        map:
+          users:
+            jmgilman: admin
+unsealer:
+  args:
+    [
+      "--mode",
+      "k8s",
+      "--k8s-secret-namespace",
+      "vault",
+      "--k8s-secret-name",
+      "vault-keys",
+    ]
+  metrics:
+    enabled: false
+statsd:
+  metrics:
+    enabled: false
