@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: consul
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+spec:
+  tls:
+    - hosts:
+        - consul.localdev
+      secretName: consul-tls
+  rules:
+    - host: consul.localdev
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: consul-ui
+              servicePort: 80
