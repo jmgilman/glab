@@ -1,0 +1,257 @@
+#!/usr/bin/env bash
+
+# Constants
+NUM_NODES=3
+CPUS=2
+MEM=4G
+DISK=32G
+
+function help {
+    echo "Usage: init.sh [COMMAND]"
+    echo "Commands:"
+    echo "  config    Downloads the k3s config and changes context to it"
+    echo "  down      Stops the cluster"
+    echo "  purge     Deletes and permanently removes the cluster"
+    echo "  rancher   Installs rancher into the cluster"
+    echo "  up        Brings up the kubernetes development stack"
+}
+
+function checkForError {
+    if [[ $1 -gt 0 ]]; then
+        echo "Error: $2"
+        exit 1
+    fi
+}
+
+function prereq {
+    # Verify mutlipass is installed
+    command -v multipass &> /dev/null
+    checkForError $? "multipass must be installed"
+
+    # Verify hostess is installed
+    command -v hostess &> /dev/null
+    checkForError $? "hostess must be installed"
+
+    # Verify helm is installed
+    command -v helm &> /dev/null
+    checkForError $? "helm must be installed"
+
+    # Verify jq is installed
+    command -v jq &> /dev/null
+    checkForError $? "jq must be installed"
+}
+
+function create_node {
+    echo "Creating node$1..."
+    multipass launch -n node${1} -c ${CPUS} -d ${DISK} -m ${MEM}
+    checkForError $? "failed creating node$1! Aborting..."
+}
+
+function start_node {
+    echo "Starting node$1..."
+    multipass start node${1}
+    checkForError $? "failed starting node$1! Aborting..."
+}
+
+function stop_node {
+    echo "Stopping node$1..."
+    multipass stop node${1}
+    checkForError $? "failed stopping node$1! Aborting..."
+}
+
+function delete_node {
+    echo "Deleting node$1..."
+    multipass delete node${1}
+    checkForError $? "failed deleting node$1! Aborting..."
+}
+
+function register_dns {
+    echo "Registering node$1 in /etc/hosts..."
+    IP=$(multipass info node${i} | grep IPv4 | awk '{print $2}')
+    sudo hostess add node${i}.dev ${IP}
+    checkForError $? "failed registering node$1 in /etc/hosts! Aborting..."
+}
+
+function unregister_dns {
+    echo "Unregistering node$1 in /etc/hosts..."
+    sudo hostess rm node${i}.dev
+    checkForError $? "failed registering node$1 in /etc/hosts! Aborting..."
+}
+
+function change_context {
+    echo "Setting context..."
+    source ~/.bashrc
+    kubectl config use-context default
+    checkForError $? "failed setting context!"
+}
+
+function up {
+    echo "Checking node state..."
+    for i in $(seq ${NUM_NODES}); do
+        # Does the node exist
+        multipass info node${i} &> /dev/null
+        if [[ ! $? -eq 0 ]]; then
+            create_node ${i}
+        fi
+
+        # Is the node running
+        state=$(multipass info node${i} | grep State | awk '{print $2}')
+        if [[ ${state} != "Running" ]]; then
+            start_node ${i}
+        fi
+
+        # Are the nodes registered in /etc/hosts
+        hostess has node${i}.dev &> /dev/null
+        if [[ ! $? -eq 0 ]]; then
+            register_dns ${i}
+        fi
+    done
+
+    echo "Checking cluster state..."
+    # Check if the cluster has been configured
+    multipass exec node1 -- sudo kubectl cluster-info | grep "is running" &> /dev/null
+    if [[ ! $? -eq 0 ]]; then
+        echo "Setting up master on node1..."
+        multipass exec node1 -- bash -c "curl -sfL https://get.k3s.io | sh -"
+        checkForError $? "failed configuring the master on node1! Aborting..."
+    fi
+
+    TOKEN=$(multipass exec node1 sudo cat /var/lib/rancher/k3s/server/node-token)
+    IP=$(multipass info node1 | grep IPv4 | awk '{print $2}')
+
+    # Check if individual nodes are registered
+    for i in $(seq ${NUM_NODES}); do
+        multipass exec node1 -- sudo kubectl get nodes | grep node${i} &> /dev/null
+        if [[ ! $? -eq 0 ]]; then
+            echo "Registering node$i..."
+            multipass exec node${i} -- bash -c "curl -sfL https://get.k3s.io | K3S_URL=\"https://$IP:6443\" K3S_TOKEN=\"$TOKEN\" sh -"
+        fi
+    done
+
+    config
+
+    echo "Cluster is up!"
+}
+
+function down {
+    # Loop backwards to stop worker nodes first
+    for i in $(seq ${NUM_NODES} 1); do
+        stop_node ${i}
+    done
+
+    echo "Cluster is down!"
+}
+
+function config {
+    echo "Copying k3s config..."
+    IP=$(multipass info node1 | grep IPv4 | awk '{print $2}')
+    mkdir -p "$HOME/.kube/custom-contexts/k3s"
+    multipass exec node1 sudo cat /etc/rancher/k3s/k3s.yaml > "$HOME/.kube/custom-contexts/k3s/config.yml"
+    checkForError $? "failed copying k3s config!"
+    sed -i '' "s/127.0.0.1/$IP/" "$HOME/.kube/custom-contexts/k3s/config.yml"
+
+    change_context
+
+    echo "Done!"
+}
+
+function rancher {
+    # Ensure we have the right context before executing kubectl commands
+    change_context
+
+    echo "Installing cert-manager CRDs..."
+    kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml &> /dev/null
+    checkForError $? "failed installing CRDs! Aborting..."
+
+    echo "Creating cert-manager namespace..."
+    kubectl create namespace cert-manager &> /dev/null
+    checkForError $? "failed creating namespace! Aborting..."
+
+    echo "Adding jetstack repo..."
+    helm repo add jetstack https://charts.jetstack.io &> /dev/null
+    checkForError $? "failed adding repo! Aborting..."
+    helm repo update
+
+    echo "Installing cert-manager chart..."
+    helm install cert-manager jetstack/cert-manager --namespace cert-manager --version v0.12.0 &> /dev/null
+    checkForError $? "failed installing cert-manager! Aborting..."
+
+    echo "Waiting for cert-manager rollout..."
+    sleep 60
+
+    echo "Adding rancher repo..."
+    helm repo add rancher-latest https://releases.rancher.com/server-charts/latest &> /dev/null
+    checkForError $? "failed adding repo! Aborting..."
+    helm repo update
+
+    echo "Creating rancher namespace"
+    kubectl create namespace rancher &> /dev/null
+    checkForError $? "failed creating namespace! Aborting..."
+
+    echo "Installing rancher chart..."
+    helm install rancher rancher-latest/rancher \
+    --version 2.4.3-rc4 \
+    --namespace rancher \
+    --set hostname=rancher.localdev \
+    --set ingress.tls.source=rancher &> /dev/null
+
+    checkForError $? "failed installing rancher! Aborting..."
+
+    echo "Waiting for Rancher to come up..."
+    kubectl -n rancher rollout status deploy/rancher
+
+    # This hack is required to fix self-signed certs. See https://github.com/rancher/rancher/issues/27297.
+    echo "Applying self-signed cert workaround..."
+    kubectl get issuer rancher -n rancher -o yaml > tmp.yml
+    sed -i '' '/^    secretName:/d' tmp.yml
+    sed -i '' 's/^  ca:/  selfSigned: {}/' tmp.yml
+    kubectl delete issuer rancher -n rancher
+    kubectl create -f tmp.yml -n rancher
+    kubectl delete cert tls-rancher-ingress -n rancher
+    rm tmp.yml
+
+    IP=$(kubectl get service traefik -n kube-system -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip')
+    echo "Registering rancher.localdev in /etc/hosts..."
+    sudo hostess add rancher.localdev ${IP}
+
+    echo "Done!"
+}
+
+function purge {
+    for i in $(seq ${NUM_NODES}); do
+        delete_node ${i}
+        unregister_dns ${i}
+    done
+
+    sudo hostess rm rancher.localdev
+
+    multipass purge &> /dev/null
+    checkForError $? "failed purging cluster!"
+
+    echo "Cluster purged!"
+}
+
+# Check pre-reqs before continuing
+prereq
+
+# Parse command
+case "$1" in
+up)
+    up
+    ;;
+down)
+    down
+    ;;
+purge)
+    purge
+    ;;
+config)
+    config
+    ;;
+rancher)
+    rancher
+    ;;
+*)
+    help
+    exit 1
+esac
