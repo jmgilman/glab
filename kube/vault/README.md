@@ -7,6 +7,10 @@
   * `helm repo update`
 * Install Consul:
   * `helm install consul hashicorp/consul -n vault -f helm-consul.yml`
+* Add AWS credentials to enable S3 storage and KMS decryption
+  * kubectl create secret generic aws-api -n vault \
+    --from-literal=access_key=${AWS_SECRET_ACCESS_KEY} \
+    --from-literal=access_key_id=${AWS_ACCESS_KEY_ID}
 * Add Vault helm repo:
   * `helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master`
   * `helm repo update`

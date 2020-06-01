@@ -1,5 +1,12 @@
 replicaCount: 3
 vault:
+  envSecrets:
+    - secretName: aws-api
+      secretKey: access_key_id
+      envName: AWS_ACCESS_KEY_ID
+    - secretName: aws-api
+      secretKey: access_key
+      envName: AWS_SECRET_ACCESS_KEY
   config:
     listener:
       tcp:
@@ -59,7 +66,7 @@ vault:
     auth:
       - type: github
         config:
-          organization: Gilman-Lab
+          organization: GilmanLab
         map:
           users:
             jmgilman: admin
@@ -67,11 +74,17 @@ unsealer:
   args:
     [
       "--mode",
-      "k8s",
-      "--k8s-secret-namespace",
-      "vault",
-      "--k8s-secret-name",
-      "vault-keys",
+      "aws-kms-s3",
+      "--aws-kms-key-id",
+      "a17327d6-7440-464e-9979-afd8a4c527c5",
+      "--aws-kms-region",
+      "us-west-2",
+      "--aws-s3-region",
+      "us-west-2",
+      "--aws-s3-bucket",
+      "glab-vault",
+      "--aws-s3-prefix",
+      "kube",
     ]
   metrics:
     enabled: false
