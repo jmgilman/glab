@@ -65,6 +65,18 @@ function delete_node {
     checkForError $? "failed deleting node$1! Aborting..."
 }
 
+function handle_packages {
+    echo "Installing/upgrading packages on node$1"
+    multipass exec node${1} -- sudo apt update
+    checkForError $? "failed updating package list on node$1! Aborting..."
+
+    multipass exec node${1} -- sudo apt upgrade -y
+    checkForError $? "failed upgrading packages on node$1! Aborting..."
+
+    multipass exec node${1} -- sudo apt install nfs-common -y
+    checkForError $? "failed installing required packages on node$1! Aborting..."
+}
+
 function register_dns {
     echo "Registering node$1 in /etc/hosts..."
     IP=$(multipass info node${i} | grep IPv4 | awk '{print $2}')
@@ -92,6 +104,8 @@ function up {
         multipass info node${i} &> /dev/null
         if [[ ! $? -eq 0 ]]; then
             create_node ${i}
+            sleep 10
+            handle_packages ${i}
         fi
 
         # Is the node running

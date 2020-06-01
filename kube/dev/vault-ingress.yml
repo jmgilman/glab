@@ -1,20 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: consul
+  name: vault
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   tls:
     - hosts:
-        - consul.gilman.io
-      secretName: consul-tls
+        - secrets.localdev
+      secretName: secrets-tls
   rules:
-    - host: consul.gilman.io
+    - host: secrets.localdev
       http:
         paths:
           - path: /
             backend:
-              serviceName: consul-ui
-              servicePort: 80
+              serviceName: vault
+              servicePort: 8200
