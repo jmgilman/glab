@@ -7,7 +7,7 @@ github_token: "{{ lookup('env','GITHUB_TOKEN') }}"
 # Program lists
 languages: ['go', 'node', 'python3', 'ruby']
 dev_tools: ['hey', 'http-server', 'protobuf', 'poetry', 'duti', 'jq']
-lab_tools: ['consul', 'packer', 'terraform', 'vault', 'kubectl', 'minikube', 'helm', 'pulumi', 'hostess']
+lab_tools: ['consul', 'packer', 'terraform', 'vault', 'kubectl', 'minikube', 'helm', 'pulumi', 'hostess', 'awscli']
 casks: ['multipass']
 
 # Python packages
