@@ -67,6 +67,8 @@ vault:
       - type: github
         config:
           organization: GilmanLab
+          token_ttl: 12h
+          token_max_ttl: 24h
         map:
           users:
             jmgilman: admin

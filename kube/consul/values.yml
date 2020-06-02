@@ -1,0 +1,11 @@
+global:
+  name: consul
+  datacenter: glab
+  gossipEncryption:
+    secretName: consul-gossip-encryption-key
+    secretKey: key
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+server:
+  storageClass: nfs-client
