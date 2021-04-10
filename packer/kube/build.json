@@ -22,16 +22,14 @@
       "disk_thin_provisioned": "{{ user `hw_thin` }}",
       "network_adapters": [
         {
-          "network": "Orchestration",
-          "network_card": "vmxnet3"
-        },
-        {
-          "network": "Dev",
-          "network_card": "vmxnet3"
-        },
-        {
           "network": "Prod",
           "network_card": "vmxnet3"
+        }
+      ],
+      "storage": [
+        {
+          "disk_size": 50000,
+          "disk_thin_provisioned": true
         }
       ],
       "guest_os_type": "{{ user `hw_os` }}",

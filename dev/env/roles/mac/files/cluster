@@ -4,7 +4,7 @@
 NUM_NODES=3
 CPUS=2
 MEM=4G
-DISK=32G
+DISK=50G
 
 function help {
     echo "Usage: init.sh [COMMAND]"
@@ -45,6 +45,13 @@ function create_node {
     echo "Creating node$1..."
     multipass launch -n node${1} -c ${CPUS} -d ${DISK} -m ${MEM}
     checkForError $? "failed creating node$1! Aborting..."
+
+    echo "Creating loopback disk on node$1..."
+    multipass exec node${1} -- sudo dd if=/dev/zero of=loopbackfile.img bs=100M count=100
+    checkForError $? "failed creating loopback disk on node$1! Aborting..."
+
+    multipass exec node${1} -- sudo losetup -fP loopbackfile.img
+    checkForError $? "failed creating loopback disk on node$1! Aborting..."
 }
 
 function start_node {
@@ -73,8 +80,12 @@ function handle_packages {
     multipass exec node${1} -- sudo apt upgrade -y
     checkForError $? "failed upgrading packages on node$1! Aborting..."
 
-    multipass exec node${1} -- sudo apt install nfs-common -y
+    multipass exec node${1} -- sudo apt install nfs-common open-iscsi -y
     checkForError $? "failed installing required packages on node$1! Aborting..."
+
+    echo "Starting required services on node$1..."
+    multipass exec node${1} -- sudo systemctl enable --now iscsid
+    checkForError $? "failed starting required services on node$1! Aborting..."
 }
 
 function register_dns {

@@ -1,25 +1,26 @@
 ---
 - hosts: kube
+  become: yes
   roles:
     - common
   tasks:
     - name: Disable SWAP since kubernetes can't work with swap enabled
-      become: yes
       shell: swapoff -a
     - name: Disable SWAP in fstab since kubernetes can't work with swap enabled
-      become: yes
       replace:
         path: /etc/fstab
         regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
         replace: '# \1'
       register: fstab
     - name: NFS tools are installed
-      become: yes
       package:
         name: nfs-common
         state: present
-    - name: Network configured
-      become: yes
-      copy:
-        src: kube-network.yml
-        dest: /etc/netplan/01-netcfg.yaml
+    - name: iSCSI installed
+      apt:
+        name: open-iscsi
+        state: present
+    - name: iSCSI enabled
+      service:
+        name: iscsid
+        enabled: yes

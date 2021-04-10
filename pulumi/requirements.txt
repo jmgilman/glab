@@ -1,1 +1,10 @@
-pulumi>=2.0.0,<3.0.0
+Arpeggio==1.9.2
+attrs==19.3.0
+dill==0.3.1.1
+grpcio==1.29.0
+parver==0.3.0
+protobuf==3.12.1
+pulumi==2.2.1
+pulumi-vsphere==2.3.4
+semver==2.10.1
+six==1.15.0

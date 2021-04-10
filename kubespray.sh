@@ -19,4 +19,4 @@ sudo pip3 install -r kubespray/requirements.txt
 
 # Copy inventory
 echo "Copying inventory..."
-cp -rfp kubespray_inv kubespray/inventory/gilman
+cp -rfp inv kubespray/inventory/gilman
